@@ -22,6 +22,8 @@ urlpatterns = [
 
     path('wendler-plans/delete/<int:plan_id>/', views.delete_wendler_plan, name='delete_wendler_plan'),
 
+    path('proficiency/', views.proficiency_calculator, name='proficiency_calculator'),
+
     # Matches any html file
     re_path(r'^.*\.*', views.pages, name='pages'),
 

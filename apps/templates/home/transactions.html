@@ -24,28 +24,43 @@
       </div>
   </div>
   
-  <div class="card card-body border-0 shadow table-wrapper table-responsive">
-      <h1>Visualization of 1RPM</h1>
-    {% if plot_divs %}
-    {% for plot_div in plot_divs %}
-        <div class="plotly-figure">
-            {{ plot_div|safe }}  <!-- Render each plotly figure -->
+  <div class="container">
+        <h1>Backend Proficiency Calculator</h1>
+        <p>Recommended Score: 50</p>
+        <div>
+            <p>Total Score: <span class="score">{{ total_score }}/180</span></p>
         </div>
-    {% endfor %}
-{% else %}
-    <p>No plots available.</p>
-{% endif %}
-
-{% if file_errors %}
-    <div class="alert alert-danger">
-        <ul>
-            {% for error in file_errors %}
-                <li>{{ error }}</li>
-            {% endfor %}
-        </ul>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Beginner</th>
+                    <th>Intermediate</th>
+                    <th>Advanced</th>
+                    <th>Expert</th>
+                    <th>Weight</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for skill in skills %}
+                <tr>
+                    <td>{{ skill.name }}</td>
+                    <td>{{ skill.beginner }}</td>
+                    <td>{{ skill.intermediate }}</td>
+                    <td>{{ skill.advanced }}</td>
+                    <td>{{ skill.expert }}</td>
+                    <td>
+                        <select name="weight" class="form-select" id="weight">
+                            {% for i in range %}
+                            <option value="{{ i }}" {% if i == skill.weight %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-{% endif %}
-  </div>
 
 {% endblock content %}
 

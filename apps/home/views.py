@@ -45,6 +45,41 @@ def index(request):
     html_template = loader.get_template('home/dashboard.html')
     return HttpResponse(html_template.render(context, request))
 
+
+def proficiency_calculator(request):
+    # Define the skills and levels (can also be retrieved from a database)
+    skills = [
+        {
+            'name': 'Basic understanding of server-side programming languages',
+            'beginner': 'Basic understanding of server-side programming languages (e.g., Python, Node.js, Java, Ruby)',
+            'intermediate': 'Proficient in designing and implementing RESTful APIs with CRUD functionality.',
+            'advanced': 'Proficiency in implementing robust authentication and authorization mechanisms.',
+            'expert': 'Mastery of distributed systems, including managing data consistency, eventual consistency, and CAP theorem implications.',
+            'weight': 5  # This can be dynamically adjusted
+        },
+        {
+            'name': 'Familiarity with HTTP protocols and client-server architecture',
+            'beginner': 'Familiarity with HTTP protocols, request/response cycles, and basic client-server architecture.',
+            'intermediate': 'Understanding of relational databases (e.g., MySQL, PostgreSQL) and NoSQL databases (e.g., MongoDB, Redis).',
+            'advanced': 'Knowledge of microservices architecture and ability to design and develop microservices-based applications.',
+            'expert': 'Extensive experience with database replication, sharding, and high availability setups.',
+            'weight': 5
+        },
+        # Add more skill entries as needed
+    ]
+
+    # Total score is calculated based on the weights.
+    total_score = sum(skill['weight'] for skill in skills)
+
+    # Context to pass to the template
+    context = {
+        'skills': skills,
+        'total_score': total_score,
+        'range': range(6)  # Weight range options (0-5)
+    }
+
+    return render(request, 'transactions.html', context)
+
 # View for the Wendler 5/3/1 calculator
 def wendler_view(request):
     if request.method == 'POST':
