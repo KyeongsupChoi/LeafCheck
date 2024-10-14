@@ -24,43 +24,94 @@
       </div>
   </div>
   
-  <div class="container">
-        <h1>Backend Proficiency Calculator</h1>
-        <p>Recommended Score: 50</p>
-        <div>
-            <p>Total Score: <span class="score">{{ total_score }}/180</span></p>
-        </div>
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Category</th>
-                    <th>Beginner</th>
-                    <th>Intermediate</th>
-                    <th>Advanced</th>
-                    <th>Expert</th>
-                    <th>Weight</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for skill in skills %}
-                <tr>
-                    <td>{{ skill.name }}</td>
-                    <td>{{ skill.beginner }}</td>
-                    <td>{{ skill.intermediate }}</td>
-                    <td>{{ skill.advanced }}</td>
-                    <td>{{ skill.expert }}</td>
-                    <td>
-                        <select name="weight" class="form-select" id="weight">
-                            {% for i in range %}
-                            <option value="{{ i }}" {% if i == skill.weight %}selected{% endif %}>{{ i }}</option>
-                            {% endfor %}
-                        </select>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+ <div class="container">
+    <h1>Backend Proficiency Calculator</h1>
+    <p>Recommended Score: 50</p>
+
+    <form method="POST" id="proficiency-form" class="mb-4">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary btn-block">Calculate Score</button>
+    </form>
+
+    <div id="results" class="mb-5">
+        <h2>Total Score: {{ total_score }}</h2>
+        <ul>
+            {% for category, level, weight in selected_levels %}
+                <li>{{ category }} ({{ level }}) - {{ weight }} points</li>
+            {% endfor %}
+        </ul>
     </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Beginner</th>
+                <th>Intermediate</th>
+                <th>Advanced</th>
+                <th>Expert</th>
+                <th>Weight</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for skill in skills %}
+            <tr>
+                <td>{{ skill.name }}</td>
+                <td>{{ skill.beginner }}</td>
+                <td>{{ skill.intermediate }}</td>
+                <td>{{ skill.advanced }}</td>
+                <td>{{ skill.expert }}</td>
+                <td>
+                    <select name="weight_{{ skill.id }}" class="form-select" id="weight-{{ skill.id }}">
+                        {% for i in range %}
+                        <option value="{{ i }}" {% if i == skill.weight %}selected{% endif %}>{{ i }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- JavaScript to handle form submission and dynamic score calculation -->
+<script>
+// Handle form submission with AJAX
+document.getElementById('proficiency-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    const formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.text())
+    .then(data => {
+        // Update the results section with the new score
+        document.getElementById('results').innerHTML = data;
+    });
+});
+
+// Handle real-time score calculation based on selected weights
+document.querySelectorAll('select').forEach(select => {
+    select.addEventListener('change', function() {
+        let totalScore = 0;
+        document.querySelectorAll('select').forEach(s => {
+            const selectedOption = s.options[s.selectedIndex];
+            const weight = s.getAttribute('data-weight') || 0;
+            if (selectedOption) {
+                totalScore += parseInt(selectedOption.value);
+            }
+        });
+        document.getElementById('total-score').textContent = totalScore;
+    });
+});
+</script>
 
 {% endblock content %}
 
